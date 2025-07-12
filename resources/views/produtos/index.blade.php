@@ -1,53 +1,47 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Produtos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@section('title', 'Lista de Produtos')
 
-<body>
+@section('content')
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold text-white">Estoque Atual</h2>
+    <a href="{{ route('produtos.create') }}"
+       class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg shadow transition duration-200">
+       <i class="fas fa-plus mr-1"></i> Adicionar Produto
+    </a>
+  </div>
 
-    <div class="container mt-5">
-        <h1 class="mb-4">Nossos Produtos</h1>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @foreach ($produtos as $produto)
+      <div class="bg-[#1a1a25] rounded-xl p-5 border border-gray-700 hover:border-purple-500 transition duration-200 shadow-md hover:shadow-purple-600/20">
+        <h3 class="text-xl font-semibold text-purple-400 mb-1">{{ $produto->nome }}</h3>
+        <p class="text-sm text-gray-300">Preço: <span class="text-green-400">R$ {{ number_format($produto->preco, 2, ',', '.') }}</span></p>
+        <p class="text-sm text-gray-400">Estoque: {{ $produto->estoque }}</p>
+        <p class="text-sm text-gray-500">Categoria ID: {{ $produto->categoria_id }}</p>
 
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Produto</th>
-                    <th scope="col">Preço</th>
-                    <th scope="col">Categoria</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($produtos as $produto)
-                    <tr>
-                        <td>
-                            {{ $produto->id }}
-                        </td>
-                        <td>
-                            {{ $produto->nome }}
-                        </td>
-                        <td>
-                            {{ number_format($produto->preco, 2, ',', '.') }}
-                        </td>
-                        <td>
-                            {{ $produto->categoria?->nome }}
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td>colspan="4">nenhum produto cadastrado.</td>
-                    </tr>
-                @endforelse
+        <div class="mt-4 flex gap-2">
+          <a href="{{ route('produtos.edit', $produto->id) }}"
+             class="flex-1 bg-purple-700 hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg text-center transition duration-200">
+            <i class="fas fa-edit mr-1"></i> Editar
+          </a>
 
+          <form action="{{ route('produtos.destroy', $produto->id) }}" method="POST" class="flex-1">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+              class="w-full bg-gray-800 hover:bg-gray-700 text-gray-100 font-medium px-4 py-2 rounded-lg transition duration-200">
+              <i class="fas fa-trash mr-1 text-purple-400"></i> Remover
+            </button>
+          </form>
+        </div>
+      </div>
+    @endforeach
+  </div>
 
-            </tbody>
-        </table>
+  @if(count($produtos) === 0)
+    <div class="text-center py-12 text-gray-400">
+      <p class="text-purple-400 font-semibold text-lg">Nenhum produto encontrado.</p>
+      <p class="text-sm mt-2">Clique em <span class="text-purple-300 font-medium">"Adicionar Produto"</span> para criar o primeiro item no sistema.</p>
     </div>
-
-</body>
-
-</html>
+  @endif
+@endsection
